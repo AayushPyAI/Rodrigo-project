@@ -1,0 +1,14 @@
+node_modules/
+.env
+.env.*
+!.env.example
+*.log
+dist/
+coverage/
+.DS_Store
+# Google service account key — NEVER commit
+service-account.json
+secrets/
+# generated proposal PDFs (local provider)
+output/
+tmp/
