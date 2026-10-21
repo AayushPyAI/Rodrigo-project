@@ -69,6 +69,8 @@ export function buildAssistantConfig() {
       temperature: 0.4,
       messages: [{ role: "system", content: SYSTEM_PROMPT }],
       tools: [CALCULATE_LEASE_QUOTE_TOOL],
+      // Knowledge Base query tool (created once via the Vapi API; see VAPI_KB_TOOL_ID)
+      toolIds: config.vapi.kbToolId ? [config.vapi.kbToolId] : [],
     },
     voice: {
       provider: config.vapi.voiceProvider, // e.g. 11labs

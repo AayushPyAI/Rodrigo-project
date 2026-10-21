@@ -1,5 +1,7 @@
 // HTTP entrypoint. One webhook Vapi calls for BOTH tool calls and end-of-call
 // reports, plus a form->callback trigger and dev helpers.
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import express from "express";
 import { config, features, readinessReport } from "./config.js";
 import { logger } from "./utils/logger.js";
@@ -7,9 +9,16 @@ import { handleToolCalls } from "./vapi/toolHandlers.js";
 import { handleEndOfCall } from "./orchestrator.js";
 import { calculateLeaseQuote } from "./pricing.js";
 import { triggerOutboundCallback } from "./services/vapiClient.js";
+import { mintVapiPublicJwt } from "./utils/vapiJwt.js";
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 app.use(express.json({ limit: "2mb" }));
+
+// Local browser talk page (uses short-lived public JWT; no client dashboard needed)
+app.get("/talk", (_req, res) => {
+  res.sendFile(path.join(__dirname, "..", "public", "talk.html"));
+});
 
 // --- Health / readiness -------------------------------------------------------
 app.get("/health", (_req, res) => res.json({ ok: true, readiness: readinessReport() }));
@@ -74,6 +83,26 @@ app.post("/dev/quote", (req, res) => {
     return res.json(calculateLeaseQuote(req.body ?? {}, config.pricing));
   } catch (err) {
     return res.status(400).json({ error: String(err.message) });
+  }
+});
+
+// Mint a short-lived public JWT so /talk can start a web call with only the
+// client's private API key (no dashboard login / public key required).
+app.get("/dev/vapi-web-token", (_req, res) => {
+  try {
+    if (!features.vapiLive) return res.status(400).json({ error: "VAPI_API_KEY not set" });
+    if (!config.vapi.orgId) return res.status(400).json({ error: "VAPI_ORG_ID not set" });
+    if (!config.vapi.assistantId) {
+      return res.status(400).json({ error: "VAPI_ASSISTANT_ID not set" });
+    }
+    const token = mintVapiPublicJwt({
+      orgId: config.vapi.orgId,
+      privateKey: config.vapi.apiKey,
+      assistantId: config.vapi.assistantId,
+    });
+    return res.json({ token, assistantId: config.vapi.assistantId });
+  } catch (err) {
+    return res.status(500).json({ error: String(err.message) });
   }
 });
 

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Talk to WFG Agent</title>
+    <style>
+      :root {
+        --bg: #0f1419;
+        --fg: #e8eef4;
+        --muted: #9aa8b5;
+        --accent: #1f9d6a;
+        --danger: #c44;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        font-family: "Segoe UI", system-ui, sans-serif;
+        background: radial-gradient(1200px 600px at 20% 0%, #1a2a33, var(--bg));
+        color: var(--fg);
+      }
+      main {
+        width: min(420px, 92vw);
+        text-align: center;
+      }
+      h1 { font-size: 1.4rem; font-weight: 600; margin: 0 0 0.4rem; }
+      p { color: var(--muted); margin: 0 0 1.5rem; line-height: 1.45; }
+      button {
+        appearance: none;
+        border: 0;
+        border-radius: 999px;
+        padding: 0.9rem 1.6rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        background: var(--accent);
+        color: #fff;
+        min-width: 180px;
+      }
+      button.stop { background: var(--danger); }
+      button:disabled { opacity: 0.55; cursor: wait; }
+      #status { margin-top: 1.25rem; min-height: 1.4em; color: var(--muted); font-size: 0.95rem; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>WFG Commercial Executive</h1>
+      <p>Browser test — no phone number, no client dashboard login.</p>
+      <button id="btn" type="button">Talk</button>
+      <div id="status">Ready</div>
+    </main>
+
+    <script type="module">
+      import Vapi from "https://cdn.jsdelivr.net/npm/@vapi-ai/web@2.3.0/+esm";
+
+      const btn = document.getElementById("btn");
+      const status = document.getElementById("status");
+      let vapi = null;
+      let inCall = false;
+
+      function setStatus(t) { status.textContent = t; }
+
+      btn.addEventListener("click", async () => {
+        if (inCall && vapi) {
+          vapi.stop();
+          return;
+        }
+        btn.disabled = true;
+        setStatus("Getting token…");
+        try {
+          const res = await fetch("/dev/vapi-web-token");
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "token failed");
+
+          vapi = new Vapi(data.token);
+          vapi.on("call-start", () => {
+            inCall = true;
+            btn.disabled = false;
+            btn.textContent = "End call";
+            btn.classList.add("stop");
+            setStatus("Connected — speak now");
+          });
+          vapi.on("call-end", () => {
+            inCall = false;
+            btn.disabled = false;
+            btn.textContent = "Talk";
+            btn.classList.remove("stop");
+            setStatus("Call ended");
+          });
+          vapi.on("error", (e) => {
+            setStatus(e?.message || String(e));
+            btn.disabled = false;
+          });
+
+          setStatus("Connecting… allow microphone if prompted");
+          await vapi.start(data.assistantId);
+        } catch (err) {
+          setStatus(err.message || String(err));
+          btn.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>

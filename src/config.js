@@ -14,6 +14,8 @@ export const config = {
 
   vapi: {
     apiKey: val(env.VAPI_API_KEY),
+    orgId: val(env.VAPI_ORG_ID),
+    kbToolId: val(env.VAPI_KB_TOOL_ID),
     assistantId: val(env.VAPI_ASSISTANT_ID),
     phoneNumberId: val(env.VAPI_PHONE_NUMBER_ID),
     webhookSecret: val(env.VAPI_WEBHOOK_SECRET),
