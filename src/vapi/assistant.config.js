@@ -80,6 +80,30 @@ export function buildAssistantConfig() {
       provider: "deepgram",
       model: "nova-2",
       language: config.vapi.transcriberLanguage, // "multi" for EN+ES
+      smartFormat: true,
+      endpointing: 300, // ms of silence before treating the caller as done
+    },
+    // --- Conversation feel: turn-taking, barge-in, latency, noise --------------
+    // Start fast once the caller is clearly done (lower = snappier).
+    startSpeakingPlan: {
+      waitSeconds: 0.2,
+      transcriptionEndpointingPlan: {
+        onPunctuationSeconds: 0.1,
+        onNoPunctuationSeconds: 0.6,
+        onNumberSeconds: 0.6, // give the caller room when dictating numbers/emails
+      },
+    },
+    // Barge-in: stop talking as soon as the caller really speaks (>=3 words also
+    // makes coughs and "yeah/okay" backchannels NOT cut the agent off).
+    stopSpeakingPlan: {
+      numWords: 3,
+      voiceSeconds: 0.4,
+      backoffSeconds: 1,
+    },
+    firstMessageInterruptionsEnabled: true,
+    // Krisp smart denoising: filters background voices/noise before transcription.
+    backgroundSpeechDenoisingPlan: {
+      smartDenoisingPlan: { enabled: true },
     },
     // End-of-call analysis -> structured data + summary used by our webhook.
     analysisPlan: {
