@@ -21,12 +21,14 @@ function extractFromReport(message) {
     structured,
     summary: analysis.summary ?? "",
     callId: call.id ?? message?.callId ?? "",
+    callerNumber: call.customer?.number ?? "",
     transcriptUrl: artifact.recordingUrl ?? artifact.transcriptUrl ?? "",
   };
 }
 
 export async function handleEndOfCall(message) {
-  const { structured, summary, callId, transcriptUrl } = extractFromReport(message);
+  const { structured, summary, callId, callerNumber, transcriptUrl } =
+    extractFromReport(message);
 
   if (alreadyProcessed(callId)) {
     logger.info("orchestrator.skip.duplicate", { callId });
@@ -36,6 +38,14 @@ export async function handleEndOfCall(message) {
 
   // 1) Normalize to canonical CallData
   const data = normalizeCallData({ ...structured, call_id: callId, transcript_url: transcriptUrl });
+
+  // The agent asks "Can I use the same number you're calling from?" — on web
+  // calls the extractor may store that phrase (or nothing) as the phone. Prefer
+  // the real caller ID from the call object; drop junk text otherwise.
+  const phoneDigits = (data.phone || "").replace(/\D/g, "");
+  if (phoneDigits.length < 7) {
+    data.phone = callerNumber || "";
+  }
 
   // 2) Recompute the quote server-side from captured EXW so the PDF/CRM match the
   //    deterministic engine (never trust a number the LLM might have voiced).

@@ -1,6 +1,4 @@
 node_modules/
-.env
-.env.*
 !.env.example
 *.log
 dist/
@@ -12,3 +10,4 @@ secrets/
 # generated proposal PDFs (local provider)
 output/
 tmp/
+config.bat

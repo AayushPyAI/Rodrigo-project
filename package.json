@@ -1,14 +1,14 @@
 {
   "name": "wfg-ai-sales-engine",
   "version": "1.0.0",
-  "description": "WFG Holding AI voice sales engine — Vapi (GPT-4o) voice agent + deterministic HASS lease pricing + HubSpot CRM + dynamic Google Docs/PDF proposal + email automation.",
+  "description": "WFG Holding AI voice sales engine \u2014 Vapi (GPT-4o) voice agent + deterministic HASS lease pricing + HubSpot CRM + dynamic Google Docs/PDF proposal + email automation.",
   "type": "module",
   "engines": {
     "node": ">=18.17"
   },
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "node --watch src/index.js",
+    "start": "node init && node src/index.js",
+    "dev": "node init && node --watch src/index.js",
     "test": "node --test test/*.test.js",
     "quote": "node scripts/quote.js",
     "deploy:vapi": "node scripts/deploy-vapi.js"
