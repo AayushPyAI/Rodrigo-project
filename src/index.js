@@ -88,17 +88,28 @@ app.post("/dev/quote", (req, res) => {
 
 // Mint a short-lived public JWT so /talk can start a web call with only the
 // client's private API key (no dashboard login / public key required).
-app.get("/dev/vapi-web-token", (_req, res) => {
+app.get("/dev/vapi-web-token", (req, res) => {
   try {
     if (!features.vapiLive) return res.status(400).json({ error: "VAPI_API_KEY not set" });
     if (!config.vapi.orgId) return res.status(400).json({ error: "VAPI_ORG_ID not set" });
     if (!config.vapi.assistantId) {
       return res.status(400).json({ error: "VAPI_ASSISTANT_ID not set" });
     }
+    // Allow the origin serving /talk (Render domain in prod, localhost in dev)
+    // plus the configured public base URL.
+    const origins = new Set([
+      "http://localhost:3000",
+      "http://127.0.0.1:3000",
+    ]);
+    try {
+      origins.add(new URL(config.publicBaseUrl).origin);
+    } catch {}
+    if (req.headers.origin) origins.add(req.headers.origin);
     const token = mintVapiPublicJwt({
       orgId: config.vapi.orgId,
       privateKey: config.vapi.apiKey,
       assistantId: config.vapi.assistantId,
+      allowedOrigins: [...origins],
     });
     return res.json({ token, assistantId: config.vapi.assistantId });
   } catch (err) {

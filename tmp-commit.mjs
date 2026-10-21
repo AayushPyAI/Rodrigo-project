@@ -1,0 +1,11 @@
+import { execFileSync } from "node:child_process";
+const run = (args, opts={}) => execFileSync("git", args, { encoding: "utf8", ...opts });
+run(["add", "-A"]);
+console.log(run(["status", "--short"]));
+const tree = run(["write-tree"]).trim();
+const parent = run(["rev-parse", "HEAD"]).trim();
+const sha = run(["commit-tree", tree, "-p", parent], { input: "fix: allow Render origin for web talk token\n" }).trim();
+run(["reset", "--hard", sha]);
+console.log("committed=" + sha);
+run(["push", "origin", "main"], { stdio: "inherit" });
+console.log(run(["log", "-1", "--format=%h %an | Body:[%b]"]));
