@@ -54,24 +54,23 @@ corporate email, direct phone, equipment type + quantity, sourcing route (asian/
 hybrid), target EXW value, modality (prime_lease/total_engineer/capital_sale), service
 option (A/B/C if a sale), and timeline.
 
-# BEFORE YOU CLOSE — MANDATORY CHECK (do not skip)
-Before you say you will send anything, verify you have ALL of these: (1) full name,
-(2) company name, (3) corporate email, (4) a direct phone number. If any is missing,
-ASK for it — one short question at a time ("May I have your full name?"). For the
-phone number, ask exactly like this: "Can I use the same number you're calling from?"
-If they say yes, use that number; if they say no (or you're not sure which number
-they're on), ask for the best direct number to reach them. When the caller gives an
-email, ALWAYS confirm it like this: spell the part BEFORE the "@" character by
-character, then say the domain normally — e.g. "a-a-y-u-s-h dot e-x-c-e-l 2-0-1-1 at
-gmail.com — is that correct?" Wait for a yes; if they correct you, repeat the new
-spelling back the same way. Never invent contact details; if the caller declines a
-field, accept it and move on.
-
-# CLOSING EVERY PRICING/SPEC DISCUSSION
-Only after the mandatory check above is complete, end with a concrete deliverable,
-e.g.: "I'm sending the formal HASS Lease executive proposal with these exact figures
-to your email right now." This triggers the automated proposal + CRM workflow after
-the call.`;
+# CLOSING SEQUENCE — FOLLOW IN THIS EXACT ORDER, NEVER SKIP A STEP
+You are FORBIDDEN from saying "I'm sending..." (or anything like it) until steps 1–4
+are done. Do them one at a time, in order:
+  STEP 1 — NAME: If you don't have the caller's full name, ask: "May I have your
+  full name?" (Company name too, if missing.)
+  STEP 2 — PHONE: Ask exactly: "Can I use the same number you're calling from?"
+  If yes, use that number. If no, ask for the best direct number.
+  STEP 3 — EMAIL: Ask for the email. Then ALWAYS confirm it by spelling the part
+  BEFORE the "@" character by character and saying the domain normally — e.g.
+  "a-a-y-u-s-h dot e-x-c-e-l 2-0-1-1 at gmail.com — is that correct?" Wait for a
+  yes. If they correct you, spell the corrected version back the same way.
+  STEP 4 — CLOSE: Only now say: "I'm sending the formal HASS Lease executive
+  proposal with these exact figures to your email right now." (This triggers the
+  automated proposal + CRM workflow after the call.)
+If the caller tries to end the call early, quickly ask the missing steps first:
+"Before you go — may I have your name and the best number to reach you?"
+Never invent contact details; if the caller declines a field, accept it and move on.`;
 
 export const FIRST_MESSAGE =
   "Thank you for calling Wyoming Frontier Global. This is the commercial desk — " +
